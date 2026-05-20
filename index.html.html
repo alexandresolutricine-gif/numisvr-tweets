@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tweet Replies — NumisVR</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #0a0a0f;
+    font-family: 'DM Mono', monospace;
+    padding: 40px 24px;
+    color: #e8e8f0;
+  }
+  .header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    max-width: 720px; margin: 0 auto 40px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-dot {
+    width: 10px; height: 10px;
+    background: #00ff88; border-radius: 50%;
+    box-shadow: 0 0 12px #00ff88;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    letter-spacing: -0.5px; color: #fff;
+  }
+  .header span {
+    font-size: 11px; color: #555;
+    letter-spacing: 2px; text-transform: uppercase;
+    display: block; margin-top: 2px;
+  }
+  .refresh-btn {
+    background: transparent;
+    border: 1px solid #2a2a3e; color: #555;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 1px;
+    padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .refresh-btn:hover { border-color: #444; color: #888; }
+  .card {
+    background: #111118;
+    border: 1px solid #1e1e2e;
+    border-radius: 16px; overflow: hidden;
+    max-width: 720px; margin: 0 auto 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #2a2a3e; }
+  .tweet-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid #1a1a28;
+    cursor: pointer; transition: background 0.15s;
+    text-decoration: none; display: block; color: inherit;
+  }
+  .tweet-section:hover { background: #161622; }
+  .tweet-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .label {
+    font-size: 10px; letter-spacing: 2px;
+    color: #444; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .label.tweet::after { content: '↗'; font-size: 12px; color: #1d9bf0; opacity: 0.7; }
+  .date-badge {
+    font-size: 10px; color: #333;
+    letter-spacing: 1px;
+    background: #1a1a28;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .tweet-text { font-size: 14px; line-height: 1.6; color: #c8c8d8; }
+  .response-section { padding: 20px 24px; position: relative; }
+  .response-text {
+    font-size: 14px; line-height: 1.7;
+    color: #e0e0ee; padding-right: 110px;
+    white-space: pre-wrap;
+  }
+  .copy-btn {
+    position: absolute; top: 20px; right: 20px;
+    background: transparent;
+    border: 1px solid #2a2a3e; color: #888;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 1px;
+    padding: 7px 14px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .copy-btn:hover { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.05); }
+  .copy-btn.copied { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.08); }
+  .status {
+    text-align: center; padding: 80px 20px;
+    font-size: 13px; letter-spacing: 1px; color: #333;
+  }
+  .status.error { color: #ff4466; }
+  .count {
+    text-align: center; color: #333;
+    font-size: 11px; letter-spacing: 2px;
+    max-width: 720px; margin: 0 auto 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-dot"></div>
+    <div>
+      <h1>Tweet Replies</h1>
+      <span>Clic tweet → ouvre X · Copier → coller</span>
+    </div>
+  </div>
+  <button class="refresh-btn" onclick="fetchData()">↻ Actualiser</button>
+</div>
+
+<div id="content"><div class="status">Chargement...</div></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwx1EGijvTzZPSu9i7hD1V2Fw2HJG-W7qGUYsLkADtR7knjqT6d8m8JUC-4AEIzydA4NQ/exec";
+
+function formatDate(raw) {
+  if (!raw) return "";
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+async function fetchData() {
+  document.getElementById("content").innerHTML = '<div class="status">Chargement...</div>';
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const filtered = data.filter(r => r.response && r.response.trim() !== "");
+    render(filtered);
+  } catch(e) {
+    document.getElementById("content").innerHTML = `<div class="status error">Erreur : ${e.message}</div>`;
+  }
+}
+
+function render(data) {
+  if (data.length === 0) {
+    document.getElementById("content").innerHTML = '<div class="status">Aucune réponse</div>';
+    return;
+  }
+  let html = `<div class="count">${data.length} réponse${data.length > 1 ? "s" : ""}</div>`;
+  data.forEach((row, i) => {
+    const dateStr = formatDate(row.date);
+    html += `
+    <div class="card">
+      <a class="tweet-section" href="${row.lien || '#'}" target="_blank" rel="noopener noreferrer">
+        <div class="tweet-header">
+          <div class="label tweet">Tweet original</div>
+          ${dateStr ? `<div class="date-badge">📅 ${dateStr}</div>` : ""}
+        </div>
+        <div class="tweet-text">${row.tweet}</div>
+      </a>
+      <div class="response-section">
+        <div class="label" style="margin-bottom:10px">Réponse NumisVR</div>
+        <div class="response-text">${row.response}</div>
+        <button class="copy-btn" id="btn-${i}" onclick="copyText(this, ${i})">Copier</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById("content").innerHTML = html;
+
+  // Store responses for copy
+  window._responses = data.map(r => r.response);
+}
+
+function copyText(btn, i) {
+  navigator.clipboard.writeText(window._responses[i]);
+  btn.textContent = "✓ Copié";
+  btn.classList.add("copied");
+  setTimeout(() => { btn.textContent = "Copier"; btn.classList.remove("copied"); }, 2000);
+}
+
+fetchData();
+</script>
+</body>
+</html>
