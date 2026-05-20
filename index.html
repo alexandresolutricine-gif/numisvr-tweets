@@ -9,10 +9,10 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     min-height: 100vh;
-    background: #0a0a0f;
+    background: #daeaf7;
     font-family: 'DM Mono', monospace;
     padding: 40px 24px;
-    color: #e8e8f0;
+    color: #1a3a5c;
   }
   .header {
     display: flex; align-items: center;
@@ -22,46 +22,47 @@
   .header-left { display: flex; align-items: center; gap: 12px; }
   .header-dot {
     width: 10px; height: 10px;
-    background: #00ff88; border-radius: 50%;
-    box-shadow: 0 0 12px #00ff88;
+    background: #2a7abf; border-radius: 50%;
+    box-shadow: 0 0 12px #2a7abf;
     animation: pulse 2s infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .header h1 {
     font-family: 'Syne', sans-serif;
     font-size: 22px; font-weight: 800;
-    letter-spacing: -0.5px; color: #fff;
+    letter-spacing: -0.5px; color: #1a3a5c;
   }
   .header span {
-    font-size: 11px; color: #555;
+    font-size: 11px; color: #5a8ab0;
     letter-spacing: 2px; text-transform: uppercase;
     display: block; margin-top: 2px;
   }
   .refresh-btn {
     background: transparent;
-    border: 1px solid #2a2a3e; color: #555;
+    border: 1px solid #a0c4e0; color: #5a8ab0;
     font-family: 'DM Mono', monospace;
     font-size: 11px; letter-spacing: 1px;
     padding: 8px 16px; border-radius: 8px;
     cursor: pointer; transition: all 0.2s;
     text-transform: uppercase;
   }
-  .refresh-btn:hover { border-color: #444; color: #888; }
+  .refresh-btn:hover { border-color: #2a7abf; color: #2a7abf; }
   .card {
-    background: #111118;
-    border: 1px solid #1e1e2e;
+    background: #ffffff;
+    border: 1px solid #b8d4ea;
     border-radius: 16px; overflow: hidden;
     max-width: 720px; margin: 0 auto 20px;
     transition: border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(42,122,191,0.08);
   }
-  .card:hover { border-color: #2a2a3e; }
+  .card:hover { border-color: #2a7abf; }
   .tweet-section {
     padding: 20px 24px;
-    border-bottom: 1px solid #1a1a28;
+    border-bottom: 1px solid #c8dff0;
     cursor: pointer; transition: background 0.15s;
     text-decoration: none; display: block; color: inherit;
   }
-  .tweet-section:hover { background: #161622; }
+  .tweet-section:hover { background: #edf5fb; }
   .tweet-header {
     display: flex; align-items: center;
     justify-content: space-between;
@@ -69,42 +70,43 @@
   }
   .label {
     font-size: 10px; letter-spacing: 2px;
-    color: #444; text-transform: uppercase;
+    color: #5a8ab0; text-transform: uppercase;
     display: flex; align-items: center; gap: 8px;
   }
   .label.tweet::after { content: '↗'; font-size: 12px; color: #1d9bf0; opacity: 0.7; }
   .date-badge {
-    font-size: 10px; color: #333;
+    font-size: 10px; color: #2a7abf;
     letter-spacing: 1px;
-    background: #1a1a28;
+    background: #daeaf7;
+    border: 1px solid #a0c4e0;
     padding: 3px 8px; border-radius: 4px;
   }
-  .tweet-text { font-size: 14px; line-height: 1.6; color: #c8c8d8; }
+  .tweet-text { font-size: 14px; line-height: 1.6; color: #2c5282; }
   .response-section { padding: 20px 24px; position: relative; }
   .response-text {
     font-size: 14px; line-height: 1.7;
-    color: #e0e0ee; padding-right: 110px;
+    color: #1a3a5c; padding-right: 110px;
     white-space: pre-wrap;
   }
   .copy-btn {
     position: absolute; top: 20px; right: 20px;
     background: transparent;
-    border: 1px solid #2a2a3e; color: #888;
+    border: 1px solid #a0c4e0; color: #5a8ab0;
     font-family: 'DM Mono', monospace;
     font-size: 11px; letter-spacing: 1px;
     padding: 7px 14px; border-radius: 8px;
     cursor: pointer; transition: all 0.2s;
     text-transform: uppercase;
   }
-  .copy-btn:hover { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.05); }
-  .copy-btn.copied { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.08); }
+  .copy-btn:hover { border-color: #2a7abf; color: #2a7abf; background: rgba(42,122,191,0.05); }
+  .copy-btn.copied { border-color: #2a7abf; color: #2a7abf; background: rgba(42,122,191,0.1); }
   .status {
     text-align: center; padding: 80px 20px;
-    font-size: 13px; letter-spacing: 1px; color: #333;
+    font-size: 13px; letter-spacing: 1px; color: #5a8ab0;
   }
-  .status.error { color: #ff4466; }
+  .status.error { color: #c0392b; }
   .count {
-    text-align: center; color: #333;
+    text-align: center; color: #5a8ab0;
     font-size: 11px; letter-spacing: 2px;
     max-width: 720px; margin: 0 auto 24px;
   }
@@ -135,12 +137,21 @@ function formatDate(raw) {
   return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
+function isRecent(raw) {
+  if (!raw) return true; // si pas de date, on garde
+  const d = new Date(raw);
+  if (isNaN(d)) return true;
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  return d >= threeDaysAgo;
+}
+
 async function fetchData() {
   document.getElementById("content").innerHTML = '<div class="status">Chargement...</div>';
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
-    const filtered = data.filter(r => r.response && r.response.trim() !== "");
+    const filtered = data.filter(r => r.response && r.response.trim() !== "" && isRecent(r.date));
     render(filtered);
   } catch(e) {
     document.getElementById("content").innerHTML = `<div class="status error">Erreur : ${e.message}</div>`;
@@ -149,10 +160,10 @@ async function fetchData() {
 
 function render(data) {
   if (data.length === 0) {
-    document.getElementById("content").innerHTML = '<div class="status">Aucune réponse</div>';
+    document.getElementById("content").innerHTML = '<div class="status">Aucune réponse récente (moins de 3 jours)</div>';
     return;
   }
-  let html = `<div class="count">${data.length} réponse${data.length > 1 ? "s" : ""}</div>`;
+  let html = `<div class="count">${data.length} réponse${data.length > 1 ? "s" : ""} (3 derniers jours)</div>`;
   data.forEach((row, i) => {
     const dateStr = formatDate(row.date);
     html += `
@@ -172,8 +183,6 @@ function render(data) {
     </div>`;
   });
   document.getElementById("content").innerHTML = html;
-
-  // Store responses for copy
   window._responses = data.map(r => r.response);
 }
 
