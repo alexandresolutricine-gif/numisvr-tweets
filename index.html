@@ -81,7 +81,15 @@
     border: 1px solid #a0c4e0;
     padding: 3px 8px; border-radius: 4px;
   }
-  .tweet-text { font-size: 14px; line-height: 1.6; color: #2c5282; }
+  .tweet-text {
+    font-size: 14px; line-height: 1.6;
+    color: #2c5282;
+    transition: color 0.2s;
+  }
+  .tweet-text.done {
+    color: #c0392b;
+    font-weight: 500;
+  }
   .response-section { padding: 20px 24px; position: relative; }
   .response-text {
     font-size: 14px; line-height: 1.7;
@@ -130,6 +138,17 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwx1EGijvTzZPSu9i7hD1V2Fw2HJG-W7qGUYsLkADtR7knjqT6d8m8JUC-4AEIzydA4NQ/exec";
 
+// Charge les tweets cliqués depuis localStorage
+const STORAGE_KEY = "numisvr_done_tweets";
+function getDone() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } 
+  catch { return []; }
+}
+function markDone(id) {
+  const done = getDone();
+  if (!done.includes(id)) { done.push(id); localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); }
+}
+
 function formatDate(raw) {
   if (!raw) return "";
   const d = new Date(raw);
@@ -138,7 +157,7 @@ function formatDate(raw) {
 }
 
 function isRecent(raw) {
-  if (!raw) return true; // si pas de date, on garde
+  if (!raw) return true;
   const d = new Date(raw);
   if (isNaN(d)) return true;
   const threeDaysAgo = new Date();
@@ -163,17 +182,21 @@ function render(data) {
     document.getElementById("content").innerHTML = '<div class="status">Aucune réponse récente (moins de 3 jours)</div>';
     return;
   }
+  const done = getDone();
   let html = `<div class="count">${data.length} réponse${data.length > 1 ? "s" : ""} (3 derniers jours)</div>`;
   data.forEach((row, i) => {
     const dateStr = formatDate(row.date);
+    const tweetId = row.testId || row.lien || i;
+    const isDone = done.includes(String(tweetId));
     html += `
     <div class="card">
-      <a class="tweet-section" href="${row.lien || '#'}" target="_blank" rel="noopener noreferrer">
+      <a class="tweet-section" href="${row.lien || '#'}" target="_blank" rel="noopener noreferrer"
+         onclick="markDone('${tweetId}'); document.getElementById('tweet-${i}').classList.add('done');">
         <div class="tweet-header">
-          <div class="label tweet">Tweet original</div>
+          <div class="label tweet">Tweet original${isDone ? ' ✓' : ''}</div>
           ${dateStr ? `<div class="date-badge">📅 ${dateStr}</div>` : ""}
         </div>
-        <div class="tweet-text">${row.tweet}</div>
+        <div class="tweet-text ${isDone ? 'done' : ''}" id="tweet-${i}">${row.tweet}</div>
       </a>
       <div class="response-section">
         <div class="label" style="margin-bottom:10px">Réponse NumisVR</div>
