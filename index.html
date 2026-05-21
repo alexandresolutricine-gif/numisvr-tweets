@@ -7,146 +7,53 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: #daeaf7;
-    font-family: 'DM Mono', monospace;
-    padding: 40px 24px;
-    color: #1a3a5c;
-  }
-  .header {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    max-width: 720px; margin: 0 auto 40px;
-  }
+  body { min-height: 100vh; background: #daeaf7; font-family: 'DM Mono', monospace; padding: 40px 24px; color: #1a3a5c; }
+  .header { display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: 0 auto 40px; }
   .header-left { display: flex; align-items: center; gap: 12px; }
-  .header-dot {
-    width: 10px; height: 10px;
-    background: #2a7abf; border-radius: 50%;
-    box-shadow: 0 0 12px #2a7abf;
-    animation: pulse 2s infinite;
-  }
+  .header-dot { width: 10px; height: 10px; background: #2a7abf; border-radius: 50%; box-shadow: 0 0 12px #2a7abf; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 800;
-    letter-spacing: -0.5px; color: #1a3a5c;
-  }
-  .header span {
-    font-size: 11px; color: #5a8ab0;
-    letter-spacing: 2px; text-transform: uppercase;
-    display: block; margin-top: 2px;
-  }
-  .refresh-btn {
-    background: transparent;
-    border: 1px solid #a0c4e0; color: #5a8ab0;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px; letter-spacing: 1px;
-    padding: 8px 16px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s;
-    text-transform: uppercase;
-  }
+  .header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #1a3a5c; }
+  .header span { font-size: 11px; color: #5a8ab0; letter-spacing: 2px; text-transform: uppercase; display: block; margin-top: 2px; }
+  .refresh-btn { background: transparent; border: 1px solid #a0c4e0; color: #5a8ab0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
   .refresh-btn:hover { border-color: #2a7abf; color: #2a7abf; }
-  .card {
-    background: #ffffff;
-    border: 1px solid #b8d4ea;
-    border-radius: 16px; overflow: hidden;
-    max-width: 720px; margin: 0 auto 20px;
-    transition: border-color 0.2s;
-    box-shadow: 0 2px 8px rgba(42,122,191,0.08);
-  }
+  .card { background: #ffffff; border: 1px solid #b8d4ea; border-radius: 16px; overflow: hidden; max-width: 720px; margin: 0 auto 20px; transition: border-color 0.2s; box-shadow: 0 2px 8px rgba(42,122,191,0.08); }
   .card:hover { border-color: #2a7abf; }
-  .tweet-section {
-    padding: 20px 24px;
-    border-bottom: 1px solid #c8dff0;
-    cursor: pointer; transition: background 0.15s;
-    text-decoration: none; display: block; color: inherit;
-  }
+  .tweet-section { padding: 20px 24px; border-bottom: 1px solid #c8dff0; cursor: pointer; transition: background 0.15s; display: block; color: inherit; }
   .tweet-section:hover { background: #edf5fb; }
-  .tweet-header {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .label {
-    font-size: 10px; letter-spacing: 2px;
-    color: #5a8ab0; text-transform: uppercase;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .tweet-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .label { font-size: 10px; letter-spacing: 2px; color: #5a8ab0; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
   .label.tweet::after { content: '↗'; font-size: 12px; color: #1d9bf0; opacity: 0.7; }
-  .date-badge {
-    font-size: 10px; color: #2a7abf;
-    letter-spacing: 1px;
-    background: #daeaf7;
-    border: 1px solid #a0c4e0;
-    padding: 3px 8px; border-radius: 4px;
-  }
-  .tweet-text {
-    font-size: 14px; line-height: 1.6;
-    color: #2c5282;
-    transition: color 0.2s;
-  }
-  .tweet-text.done {
-    color: #c0392b;
-    font-weight: 500;
-  }
+  .date-badge { font-size: 10px; color: #2a7abf; letter-spacing: 1px; background: #daeaf7; border: 1px solid #a0c4e0; padding: 3px 8px; border-radius: 4px; }
+  .tweet-text { font-size: 14px; line-height: 1.6; color: #2c5282; transition: color 0.2s; }
+  .tweet-text.done { color: #c0392b; font-weight: 500; }
   .response-section { padding: 20px 24px; position: relative; }
-  .response-text {
-    font-size: 14px; line-height: 1.7;
-    color: #1a3a5c; padding-right: 110px;
-    white-space: pre-wrap;
-  }
-  .copy-btn {
-    position: absolute; top: 20px; right: 20px;
-    background: transparent;
-    border: 1px solid #a0c4e0; color: #5a8ab0;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px; letter-spacing: 1px;
-    padding: 7px 14px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s;
-    text-transform: uppercase;
-  }
+  .response-text { font-size: 14px; line-height: 1.7; color: #1a3a5c; padding-right: 110px; white-space: pre-wrap; }
+  .copy-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #a0c4e0; color: #5a8ab0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
   .copy-btn:hover { border-color: #2a7abf; color: #2a7abf; background: rgba(42,122,191,0.05); }
   .copy-btn.copied { border-color: #2a7abf; color: #2a7abf; background: rgba(42,122,191,0.1); }
-  .status {
-    text-align: center; padding: 80px 20px;
-    font-size: 13px; letter-spacing: 1px; color: #5a8ab0;
-  }
+  .status { text-align: center; padding: 80px 20px; font-size: 13px; letter-spacing: 1px; color: #5a8ab0; }
   .status.error { color: #c0392b; }
-  .count {
-    text-align: center; color: #5a8ab0;
-    font-size: 11px; letter-spacing: 2px;
-    max-width: 720px; margin: 0 auto 24px;
-  }
+  .count { text-align: center; color: #5a8ab0; font-size: 11px; letter-spacing: 2px; max-width: 720px; margin: 0 auto 24px; }
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="header-left">
     <div class="header-dot"></div>
-    <div>
-      <h1>Tweet Replies</h1>
-      <span>Clic tweet → ouvre X · Copier → coller</span>
-    </div>
+    <div><h1>Tweet Replies</h1><span>Clic tweet → ouvre X · Copier → coller</span></div>
   </div>
   <button class="refresh-btn" onclick="fetchData()">↻ Actualiser</button>
 </div>
-
 <div id="content"><div class="status">Chargement...</div></div>
-
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwx1EGijvTzZPSu9i7hD1V2Fw2HJG-W7qGUYsLkADtR7knjqT6d8m8JUC-4AEIzydA4NQ/exec";
+const STORAGE_KEY = "numisvr_done";
 
-// Charge les tweets cliqués depuis localStorage
-const STORAGE_KEY = "numisvr_done_tweets";
 function getDone() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } 
-  catch { return []; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
 }
-function markDone(id) {
-  const done = getDone();
-  if (!done.includes(id)) { done.push(id); localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); }
+function saveDone(done) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); } catch {}
 }
 
 function formatDate(raw) {
@@ -160,9 +67,9 @@ function isRecent(raw) {
   if (!raw) return true;
   const d = new Date(raw);
   if (isNaN(d)) return true;
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-  return d >= threeDaysAgo;
+  const limit = new Date();
+  limit.setDate(limit.getDate() - 3);
+  return d >= limit;
 }
 
 async function fetchData() {
@@ -173,8 +80,18 @@ async function fetchData() {
     const filtered = data.filter(r => r.response && r.response.trim() !== "" && isRecent(r.date));
     render(filtered);
   } catch(e) {
-    document.getElementById("content").innerHTML = `<div class="status error">Erreur : ${e.message}</div>`;
+    document.getElementById("content").innerHTML = '<div class="status error">Erreur : ' + e.message + '</div>';
   }
+}
+
+function handleTweetClick(idx, lien) {
+  // Marquer comme fait
+  const done = getDone();
+  if (!done.includes(idx)) { done.push(idx); saveDone(done); }
+  const el = document.getElementById("tweet-" + idx);
+  if (el) el.classList.add("done");
+  // Ouvrir dans nouvel onglet
+  window.open(lien, "_blank");
 }
 
 function render(data) {
@@ -183,27 +100,24 @@ function render(data) {
     return;
   }
   const done = getDone();
-  let html = `<div class="count">${data.length} réponse${data.length > 1 ? "s" : ""} (3 derniers jours)</div>`;
+  let html = '<div class="count">' + data.length + ' réponse' + (data.length > 1 ? "s" : "") + ' (3 derniers jours)</div>';
   data.forEach((row, i) => {
     const dateStr = formatDate(row.date);
-    const tweetId = row.testId || row.lien || i;
-    const isDone = done.includes(String(tweetId));
-    html += `
-    <div class="card">
-      <a class="tweet-section" href="${row.lien || '#'}" target="_blank" rel="noopener noreferrer"
-         onclick="markDone('${tweetId}'); document.getElementById('tweet-${i}').classList.add('done');">
-        <div class="tweet-header">
-          <div class="label tweet">Tweet original${isDone ? ' ✓' : ''}</div>
-          ${dateStr ? `<div class="date-badge">📅 ${dateStr}</div>` : ""}
-        </div>
-        <div class="tweet-text ${isDone ? 'done' : ''}" id="tweet-${i}">${row.tweet}</div>
-      </a>
-      <div class="response-section">
-        <div class="label" style="margin-bottom:10px">Réponse NumisVR</div>
-        <div class="response-text">${row.response}</div>
-        <button class="copy-btn" id="btn-${i}" onclick="copyText(this, ${i})">Copier</button>
-      </div>
-    </div>`;
+    const isDone = done.includes(i);
+    html += '<div class="card">' +
+      '<div class="tweet-section" onclick="handleTweetClick(' + i + ', \'' + (row.lien || '#') + '\')">' +
+        '<div class="tweet-header">' +
+          '<div class="label tweet">Tweet original' + (isDone ? ' ✓' : '') + '</div>' +
+          (dateStr ? '<div class="date-badge">📅 ' + dateStr + '</div>' : '') +
+        '</div>' +
+        '<div class="tweet-text ' + (isDone ? 'done' : '') + '" id="tweet-' + i + '">' + row.tweet + '</div>' +
+      '</div>' +
+      '<div class="response-section">' +
+        '<div class="label" style="margin-bottom:10px">Réponse NumisVR</div>' +
+        '<div class="response-text">' + row.response + '</div>' +
+        '<button class="copy-btn" id="btn-' + i + '" onclick="copyText(this, ' + i + ')">Copier</button>' +
+      '</div>' +
+    '</div>';
   });
   document.getElementById("content").innerHTML = html;
   window._responses = data.map(r => r.response);
