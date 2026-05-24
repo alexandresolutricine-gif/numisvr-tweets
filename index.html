@@ -8,14 +8,16 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { min-height: 100vh; background: #daeaf7; font-family: 'DM Mono', monospace; padding: 40px 24px; color: #1a3a5c; }
-  .header { display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: 0 auto 40px; }
+  .header { display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: 0 auto 40px; flex-wrap: wrap; gap: 12px; }
   .header-left { display: flex; align-items: center; gap: 12px; }
   .header-dot { width: 10px; height: 10px; background: #2a7abf; border-radius: 50%; box-shadow: 0 0 12px #2a7abf; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #1a3a5c; }
   .header span { font-size: 11px; color: #5a8ab0; letter-spacing: 2px; text-transform: uppercase; display: block; margin-top: 2px; }
-  .refresh-btn { background: transparent; border: 1px solid #a0c4e0; color: #5a8ab0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
+  .header-btns { display: flex; gap: 10px; }
+  .refresh-btn, .reset-btn { background: transparent; border: 1px solid #a0c4e0; color: #5a8ab0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
   .refresh-btn:hover { border-color: #2a7abf; color: #2a7abf; }
+  .reset-btn:hover { border-color: #c0392b; color: #c0392b; }
   .card { background: #ffffff; border: 1px solid #b8d4ea; border-radius: 16px; overflow: hidden; max-width: 720px; margin: 0 auto 20px; transition: border-color 0.2s; box-shadow: 0 2px 8px rgba(42,122,191,0.08); }
   .card.done { border-color: #e8a0a0; background: #fff8f8; }
   .tweet-section { padding: 20px 24px; border-bottom: 1px solid #c8dff0; }
@@ -40,14 +42,17 @@
 <div class="header">
   <div class="header-left">
     <div class="header-dot"></div>
-    <div><h1>Tweet Replies</h1><span>Copier → clic droit ↗ → ouvrir dans nouvelle fenêtre</span></div>
+    <div><h1>Tweet Replies</h1><span>Copier → clic droit ↗ → nouvelle fenêtre</span></div>
   </div>
-  <button class="refresh-btn" onclick="fetchData()">↻ Actualiser</button>
+  <div class="header-btns">
+    <button class="refresh-btn" onclick="fetchData()">↻ Actualiser</button>
+    <button class="reset-btn" onclick="resetAll()">⟲ Réinitialiser</button>
+  </div>
 </div>
 <div id="content"><div class="status">Chargement...</div></div>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwx1EGijvTzZPSu9i7hD1V2Fw2HJG-W7qGUYsLkADtR7knjqT6d8m8JUC-4AEIzydA4NQ/exec";
-const STORAGE_KEY = "numisvr_done";
+const STORAGE_KEY = "numisvr_done_v2";
 
 function getDone() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
@@ -55,6 +60,20 @@ function getDone() {
 function saveDone(arr) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch {}
 }
+function resetAll() {
+  if (confirm("Remettre tous les tweets en bleu (non traités) ?")) {
+    saveDone([]);
+    fetchData();
+  }
+}
+
+// Génère un ID unique stable basé sur le contenu du tweet (pas la position)
+function tweetKey(row) {
+  if (row.testId) return "id:" + row.testId;
+  if (row.lien) return "lien:" + row.lien;
+  return "txt:" + (row.tweet || "").slice(0, 50);
+}
+
 function formatDate(raw) {
   if (!raw) return "";
   const d = new Date(raw);
@@ -80,14 +99,12 @@ async function fetchData() {
     document.getElementById("content").innerHTML = '<div class="status error">Erreur : ' + e.message + '</div>';
   }
 }
-
-function markDone(i) {
+function markDone(key) {
   const done = getDone();
-  if (!done.includes(i)) { done.push(i); saveDone(done); }
-  const card = document.getElementById("card-" + i);
+  if (!done.includes(key)) { done.push(key); saveDone(done); }
+  const card = document.getElementById("card-" + btoa(unescape(encodeURIComponent(key))).slice(0,20));
   if (card) card.classList.add("done");
 }
-
 function render(data) {
   if (data.length === 0) {
     document.getElementById("content").innerHTML = '<div class="status">Aucune réponse récente</div>';
@@ -95,11 +112,15 @@ function render(data) {
   }
   const done = getDone();
   let html = '<div class="count">' + data.length + ' réponse' + (data.length > 1 ? "s" : "") + ' (3 derniers jours)</div>';
+  window._responses = {};
   data.forEach(function(row, i) {
+    const key = tweetKey(row);
+    const safeId = btoa(unescape(encodeURIComponent(key))).slice(0,20);
     const dateStr = formatDate(row.date);
-    const isDone = done.includes(i);
+    const isDone = done.includes(key);
     const lien = row.lien || '#';
-    html += '<div class="card ' + (isDone ? 'done' : '') + '" id="card-' + i + '">' +
+    window._responses[safeId] = row.response;
+    html += '<div class="card ' + (isDone ? 'done' : '') + '" id="card-' + safeId + '">' +
       '<div class="tweet-section">' +
         '<div class="tweet-header">' +
           '<div class="label">Tweet original ' + (isDone ? '✓' : '') + '</div>' +
@@ -111,22 +132,20 @@ function render(data) {
       '<div class="response-section">' +
         '<div class="label" style="margin-bottom:10px">Réponse NumisVR</div>' +
         '<div class="response-text">' + row.response + '</div>' +
-        '<button class="copy-btn" id="btn-' + i + '" onclick="copyText(this,' + i + ')">Copier</button>' +
+        '<button class="copy-btn" onclick="copyText(this, \'' + safeId + '\', \'' + encodeURIComponent(key) + '\')">Copier</button>' +
       '</div>' +
     '</div>';
   });
   document.getElementById("content").innerHTML = html;
-  window._responses = data.map(function(r){ return r.response; });
 }
-
-function copyText(btn, i) {
-  navigator.clipboard.writeText(window._responses[i]);
+function copyText(btn, safeId, encodedKey) {
+  const key = decodeURIComponent(encodedKey);
+  navigator.clipboard.writeText(window._responses[safeId]);
   btn.textContent = "✓ Copié";
   btn.classList.add("copied");
-  markDone(i);
+  markDone(key);
   setTimeout(function(){ btn.textContent = "Copier"; btn.classList.remove("copied"); }, 2000);
 }
-
 fetchData();
 </script>
 </body>
